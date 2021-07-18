@@ -1,48 +1,51 @@
 #!/usr/bin/env python3 
 
 '''
-Hi Mickey. This is a stop sign detector, it uses a open CV, which has a lot of capability to do real-time object detection with a camera. There's an xml in here it uses to find stop signs, but i can likely swap that out for an xml that finds people for your application. 
-If I can't get it to work, i can doa  little training for it and see how it goes.
+Hi Mickey. 
+This is a people detector; it uses a open CV which has a lot of capability to do real-time object detection with a camera. 
+They have a built in ML Algorithm to detect people, so this is a try at that. 
+If it works, I will replicate it in javascript.
 '''
 
+# import the necessary packages
+import numpy as np
 import cv2
+import time
+import os.path
 from matplotlib import pyplot as plt
+ 
+# initialize the HOG descriptor/person detector
+imageFiles = ['whitecollar.jpeg', 'warehouse.jpeg', 'warehouse2.png', 'warehouse3.jpg', 'warehouse4.png']
+
+class PeopleFinder:
+  hog = cv2.HOGDescriptor()
+  hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+
+  def __init__(self, filePath):
+    # ditch if we can't find the pic
+    if not os.path.exists(filePath):
+      return
+
+    self.filePath = filePath
+    self.image = cv2.imread(self.filePath)
+    cv2.startWindowThread() 
+
+  def showOriginalPic(self):
+    cv2.imshow("Output", self.image)
+    cv2.waitKey(0)
   
-# Opening image
-img = cv2.imread("image.jpg")
-  
-# OpenCV opens images as BRG 
-# but we want it as RGB We'll 
-# also need a grayscale version
-img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-  
-  
-# bothering with extra-small 
-# dots that would look like STOP signs
-stop_data = cv2.CascadeClassifier('stop_data.xml')
-  
-found = stop_data.detectMultiScale(img_gray, 
-                                   minSize =(20, 20))
-  
-# Don't do anything if there's 
-# no sign
-amount_found = len(found)
-  
-if amount_found != 0:
-      
-    # There may be more than one
-    # sign in the image
-    for (x, y, width, height) in found:
-          
-        # We draw a green rectangle around
-        # every recognized sign
-        cv2.rectangle(img_rgb, (x, y), 
-                      (x + height, y + width), 
-                      (0, 255, 0), 5)
-          
-# Creates the environment of 
-# the picture and shows it
-plt.subplot(1, 1, 1)
-plt.imshow(img_rgb)
-plt.show()
+  def showDetection(self):
+    self.boxedImage = self.image
+    boxes, weights  = self.hog.detectMultiScale(self.image)
+    boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
+    for (xA, yA, xB, yB) in boxes:
+      # display the detected boxes in the colour picture
+      cv2.rectangle(self.boxedImage , (xA, yA), (xB, yB), (0, 255, 0), 2)
+    
+    cv2.imshow("Output", self.boxedImage)
+    cv2.waitKey(0)
+
+if __name__ == "__main__":
+  for image in imageFiles:
+    ex = PeopleFinder(image)
+    ex.showDetection()
