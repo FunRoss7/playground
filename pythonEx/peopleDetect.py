@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
  
 # initialize the HOG descriptor/person detector
 imageFiles = ['whitecollar.jpeg', 'warehouse.jpeg', 'warehouse2.png', 'warehouse3.jpg', 'warehouse4.png']
+videoFiles = ['warehouse.mp4']
 
 class PeopleFinder:
   hog = cv2.HOGDescriptor()
@@ -47,5 +48,7 @@ class PeopleFinder:
 
 if __name__ == "__main__":
   for image in imageFiles:
-    ex = PeopleFinder(image)
+    inputImage = "../inputs/" + image
+
+    ex = PeopleFinder(inputImage)
     ex.showDetection()
