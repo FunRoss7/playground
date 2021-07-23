@@ -45,10 +45,14 @@ class PeopleFinder:
     
     cv2.imshow("Output", self.boxedImage)
     cv2.waitKey(0)
+  
+  def saveOutput(self, filePath):
+    cv2.imwrite(filePath, self.boxedImage)
 
 if __name__ == "__main__":
   for image in imageFiles:
     inputImage = "../inputs/" + image
-
+    outputImage = "../outputs/" + image
     ex = PeopleFinder(inputImage)
     ex.showDetection()
+    ex.saveOutput(outputImage)
